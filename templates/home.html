@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+</head>
+<body>
+{% extends "template.html" %}
+{% block content %}
+
+<div id="wrapper">
+    <div id="page-wrapper" class="gray-bg dashboard-1">
+        <div class="row border-bottom">
+            <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+                <div class="navbar-header">
+                    <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+                    <form role="search" class="navbar-form-custom" action="search_results.html">
+                        <div class="form-group">
+                            <input type="text" placeholder="" class="form-control" name="top-search" id="top-search">
+                        </div>
+                    </form>
+                </div>
+                <ul class="nav navbar-top-links navbar-right">
+                    <li>
+                        <span class="m-r-sm text-muted welcome-message">Last Updated: <span id="last_updated_time_stamp"></span></span>
+                    </li>
+                    <li>
+                        <a href="">
+                            <i class="fa fa-sign-out"></i>Confluence
+                        </a>
+                    </li>
+                    <li>
+                        <a class="right-sidebar-toggle">
+                            <i class="fa fa-tasks"></i>
+                        </a>
+                    </li>
+                </ul>
+
+            </nav>
+        </div>
+        <div class="wrapper wrapper-content">
+            <div class="row  border-bottom white-bg dashboard-header">
+            <div class="col-md-12">
+                <h3>Consumer Lending Technology Portfolio Reporting</h3>
+                <small></small>
+<!--                <button class="ui-button ui-widget ui-corner-all" id="test">Test Button</button>-->
+            </div>
+            </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>Python ETL Jobs</h5>
+                                <div class="ibox-tools">
+                                    <a class="collapse-link">
+                                        <i class="fa fa-chevron-up"></i>
+                                    </a>
+                                    <a class="close-link">
+                                        <i class="fa fa-times"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="ibox-content">
+                                <div>
+                                    <table class="table table-striped table-bordered table-hover" id="jobs_table" style="width:100%"  ></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>Data</h5>
+                                <div class="ibox-tools">
+                                    <a class="collapse-link">
+                                        <i class="fa fa-chevron-up"></i>
+                                    </a>
+                                    <a class="close-link">
+                                        <i class="fa fa-times"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="ibox-content">
+                                <div>
+                                    <table class="table table-striped table-bordered table-hover" id="data_table" style="width:100%"  ></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-content">
+                                <div class="file-manager">
+                                    <div class="hr-line-dashed"></div>
+                                    <form method="POST" action="" enctype="multipart/form-data">
+                                        <p><input type="file" name="file"></p>
+                                        <p><input type="submit" value="Submit" ></p>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+
+    function update_time_stamp(){
+        time_stamp = moment().format()
+        $('last_updated_time_stamp').html(time_stamp)
+    }
+
+
+
+    function loop_update(){
+        function refresh(){
+            update_time_stamp()
+            jobs_table_update()
+            setTimeout(refresh,5000)
+        }
+        refresh()
+    }
+
+    setTimeout(loop_update,5000)
+
+
+
+
+
+
+
+
+
+
+function datatables_config_buttons_create_base() {
+    button_params = [{
+        extend: "excel",
+        title: document.title
+    }, {
+        extend: "colvis",
+        title: document.title
+    }, {
+        text: 'Clear',
+        name: 'Clear',
+        action: function(e, dt, node, config) {
+            dt.columns('').search('').draw()
+            $.fn.dataTable.ext.search = []
+            dt.draw()
+        }
+    }]
+    return button_params
+}
+
+
+function datatables_config_create_base(data, columns, buttons) {
+    config = {
+        dom: '<"html5buttons"B>lTfgitp',
+        data: data,
+        columns: columns,
+        select: true,
+        paging: false,
+        scrollX: true,
+        //colReorder: true,
+        //autoWidth: true,
+        buttons: buttons
+    }
+    return config
+}
+
+
+function datatables_determine_create_update(selector,config,data){
+    if ( ! $.fn.DataTable.isDataTable(selector)) {
+        $(selector).DataTable(config);
+    }
+    else {
+        $(selector).DataTable().rows().remove().draw();
+        $(selector).DataTable().rows.add(data).draw();
+    }
+}
+
+function jobs_data_transform_get_modified(extension_dict,extension,key){
+    try {
+        return extension_dict[extension][0][key]
+    }
+    catch (err){
+        return '-'
+    }
+
+}
+
+function duration_calculate(startTime,endTime){
+    var momentDiff = moment.duration(moment(endTime).diff(moment(startTime)))
+    var seconds = momentDiff.asSeconds()
+    return seconds
+}
+function jobs_data_transform_group(data){
+    var extension_dict = _.groupBy(data,'extension')
+    var file_name = data[0]['file_name']
+    var script_modified = jobs_data_transform_get_modified(extension_dict,'.py','modified')//extension_dict['.py'][0]['modified']
+    var log_modified =jobs_data_transform_get_modified(extension_dict,'.Log','modified') //extension_dict['.Log'][0]['modified']
+
+    var text_modified  =jobs_data_transform_get_modified(extension_dict,'.TXT','modified')
+    var is_error = text_modified == '-'? false: moment(text_modified).isSameOrAfter(script_modified)
+    var log_started = jobs_data_transform_get_modified(extension_dict,'.Log','created')
+    var is_running = extension_dict['.pid'] == undefined ? false : true
+    var duration = duration_calculate(log_started,log_modified)
+    var status = is_error ? 'Error' : is_running ? 'Running': 'Success'
+    return {
+        file_name,
+        script_modified,
+        start:log_started,
+        end:log_modified,
+        duration,
+        is_running,
+        is_error,
+        status,
+        extension:'.py'
+    }
+}
+
+function jobs_data_transform(data){
+    var grouped_data = _.groupBy(data,'file_name')
+    var grouped_data_flattened = Object.values(grouped_data)
+    var transformed_data =  _.map(grouped_data_flattened,jobs_data_transform_group)
+    return _.filter(transformed_data,function(D){return D['script_modified'] != '-'})
+}
+
+function determine_if_data_type(i){
+   return  ['.py','.Log','.pid','.TXT'].indexOf(i)  == -1
+}
+function jobs_data_filter(data){
+    var data_array = _.filter(data,function(D){return determine_if_data_type(D['extension'])})
+    var jobs_array = _.filter(data,function(D){return !determine_if_data_type(D['extension'])})
+    return {data_array,jobs_array}
+}
+
+
+function action_button_run(file_name,button_text){
+    $.ajax({
+        type:'Get',
+        url:`/${button_text.toLowerCase()}/${file_name}`,
+        contentType:'application/json',
+        success: function(data){
+            console.log({file_name,button_text,data})
+        }
+    })
+
+    console.log({file_name,button_text})
+}
+
+
+
+function actions_buttons_render(data, type, row, meta){
+    const button_text = row.status == 'Running'? 'Stop' : row.status == 'Error' ? 'Start' : 'Start'
+    const file_name = row.file_name
+    const extension = row.extension
+
+    return `
+            <div class="input-group-btn">
+                <button tabindex="-1" onclick="action_button_run('${file_name}','${button_text}')" class="btn btn-white btn-sm action_button" action_type="${button_text}" file_name="${file_name}" type="button">${button_text}</button>
+                <button data-toggle="dropdown" class="btn btn-white dropdown-toggle btn-sm" type="button" aria-expanded="false"><span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" onclick="action_button_run('${file_name}${extension}','Delete')"   >Delete</a></li>
+                </ul>
+            </div>
+    `
+
+
+}
+
+    function file_delete_render(data, type, row, meta){
+        const file_name = row.file_name
+        const extension = row.extension
+
+        return `
+            <div class="input-group-btn">
+                <button tabindex="-1" onclick="action_button_run('${file_name}${extension}','Delete')" class="btn btn-white btn-sm action_button" type="button">Delete</button>
+
+            </div>
+    `
+
+
+    }
+
+function jobs_columns_define(){
+    return [
+        {
+            name:'Action',
+            data:'file_name',
+            title:'Action',
+            render:actions_buttons_render
+        },
+        {
+            name:'file_name',
+            data:'file_name',
+            title:'Name',
+            render:function(data, type, row, meta){
+                url = '/read/'+data+'.py'
+                return "<a target='_blank' href='"+url+"'>" +data + "</a>"
+            }
+        },
+        {
+            name:'start',
+            data:'start',
+            title:'Start'
+        },
+        {
+            name:'end',
+            data:'end',
+            title:'End'
+        },
+        {
+            name:'duration',
+            data:'duration',
+            title:'Duration'
+        },
+        {
+            name:'status',
+            data:'status',
+            title:'Status',
+            render:function(data, type, row, meta){
+                url = '/read/'+row['file_name']+'.Log'
+                return "<a target='_blank' href='"+url+"'>" +data + "</a>"
+            }
+        },
+        {
+            name:'extension',
+            data:'extension',
+            title:'extension',
+            visible:false
+        }
+    ]
+}
+
+
+    function data_columns_define(){
+        return [
+            {
+                name:'Action',
+                data:'file_name',
+                title:'Action',
+                render:file_delete_render
+            },
+            {
+                name:'file_name',
+                data:'file_name',
+                title:'Name',
+                render:function(data, type, row, meta){
+                    url = '/read/'+data+row['extension']
+                    return "<a target='_blank' href='"+url+"'>" +data + "</a>"
+                }
+            },
+            {
+                name:'created',
+                data:'created',
+                title:'created'
+            },
+            {
+                name:'modified',
+                data:'modified',
+                title:'modified'
+            },
+            {
+                name:'extension',
+                data:'extension',
+                title:'extension'
+            }
+        ]
+    }
+
+function jobs_table_update(){
+        $.ajax({
+            type:'GET',
+            url:"/jobs",
+            // data: {'name':name},
+            contentType:'application/json',
+            success: function(data){
+                var {data_array,jobs_array} = jobs_data_filter(data)
+                var transformed_data = jobs_data_transform(jobs_array)
+                var jobs_columns = jobs_columns_define()
+                var buttons = datatables_config_buttons_create_base()
+                var config = datatables_config_create_base(transformed_data, jobs_columns, buttons)
+                datatables_determine_create_update("#jobs_table",config,transformed_data)
+
+
+                var data_columns = data_columns_define()
+                var data_config = datatables_config_create_base(data_array, data_columns, buttons)
+                datatables_determine_create_update("#data_table",data_config,data_array)
+
+            }
+        })
+
+    }
+
+
+
+
+
+
+
+
+
+</script>
+
+{% endblock %}
+</body>
+</html>
