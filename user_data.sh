@@ -1,3 +1,4 @@
+#!/bin/bash
 sudo yum update -y
 
 sudo amazon-linux-extras install docker
@@ -8,6 +9,11 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 
 sudo yum install git
-git clone https://github.com/ChrisCruze/docker_flask .
+
+git init .
+git remote add origin https://github.com/ChrisCruze/docker_flask
+git fetch origin
+git checkout master
+
 
 docker-compose up
