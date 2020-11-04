@@ -10,23 +10,10 @@ from pytz import timezone
 import time
 import re
 from retrying import retry
-import pandas as pd
-import numpy as np 
 import ntpath
 
-class Read(object):
-    def read_csv(self,directory):
-        return pd.read_csv(directory,encoding="ISO-8859-1")
 
-    def convert_to_array(self,df):
-        df.to_records()
-        np.asarray(df)
-
-    def array_from_csv(self,directory):
-        df = self.read_csv(directory)
-        return self.convert_to_array(df)
-
-class SupportingFunctions(Read):
+class SupportingFunctions(object):
     def now_date_time_eastern(self, adjusted_time=True, strf='%m/%d/%y %I:%M:%S %p', eastern_time=True):
         if eastern_time:
             val = datetime.now(timezone('US/Eastern'))

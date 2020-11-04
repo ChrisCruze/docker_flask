@@ -1,7 +1,6 @@
 #!/usr/bin/python
 from flask import Flask, render_template, send_from_directory,redirect,url_for,request
 import requests
-import pandas as pd
 import os
 from flask_restful import Resource, Api,reqparse
 from flask_cors import CORS

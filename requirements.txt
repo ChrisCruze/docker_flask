@@ -1,10 +1,8 @@
 flask
 redis
 requests
-pandas
 flask-restful
 schedule
 flask_cors
 pytz
 retrying
-numpy
