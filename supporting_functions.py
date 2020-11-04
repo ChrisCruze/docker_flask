@@ -88,7 +88,7 @@ class SupportingFunctions(object):
 class FileFunctions(object):
     def static_directory_get(self,name):
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        directory = dir_path#'/'#os.path.join(dir_path,'static',name)
+        directory = os.path.join(dir_path,'static',name)
         return directory
 
     def file_stat_from_directory(self,directory):
