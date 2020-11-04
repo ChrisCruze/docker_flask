@@ -21,3 +21,9 @@ services:
     build: .
     ports:
       - "5000:5000"
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: monitoring_node_exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
