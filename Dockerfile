@@ -8,4 +8,4 @@ COPY start.sh start.sh
 RUN pip install -r requirements.txt
 EXPOSE 5000
 COPY . .
-CMD [start.sh]
+CMD './start.sh'
