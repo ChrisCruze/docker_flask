@@ -29,7 +29,7 @@ def read_file(directory):
 class Read(Resource):
     def get(self,file_id):
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        directory = os.path.join(dir_path,'static','jobs')
+        directory = '/'#os.path.join(dir_path,'static','jobs')
         directory = os.path.join(directory,file_id)
         return read_file(directory)
 api.add_resource(Read, '/read/<string:file_id>')
@@ -103,7 +103,7 @@ def upload_file():
     uploaded_file = request.files['file']
     if uploaded_file.filename != '':
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        directory = os.path.join(dir_path,'static','jobs',uploaded_file.filename)
+        directory = uploaded_file.filename #os.path.join(dir_path,'static','jobs',uploaded_file.filename)
         uploaded_file.save(directory)
     return redirect(request.url)
 
