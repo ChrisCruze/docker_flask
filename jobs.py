@@ -16,8 +16,11 @@ def job_file_directory_create(file_name):
 def initiate_python_script(directory):
 	file_name = ntpath.basename(directory).replace('.py','')
 
+	print (file_name)
 	pid = str(os.getpid())
+	print (pid)
 	pidfile = os.path.join(FileFunctions().static_directory_get('jobs'),file_name + '.pid')
+	print (pidfile)
 	if not os.path.isfile(pidfile):
 		f = open(pidfile, 'w+')
 		f.write(pid)
@@ -35,6 +38,7 @@ def initiate_python_script(directory):
 
 
 	current_working_directory = os.getcwd()
+	print (current_working_directory)
 	os.chdir(FileFunctions().static_directory_get('jobs'))
 	try:
 		script_directory = os.path.join(FileFunctions().static_directory_get('jobs'),file_name + '.py')

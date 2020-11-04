@@ -70,15 +70,18 @@ class Stop(Resource):
 
 class Start(Resource):
     def get(self,file_id):
+
         directory = FileFunctions().static_directory_get('jobs')
         file_directory = os.path.join(directory,file_id + '.py')
         try:
-            script = open(file_directory,'r+').read()
-            f = open(file_directory, 'w+')
-            f.write(script)
+            jobs.initiate_python_script(file_directory)
+            # script = open(file_directory,'r+').read()
+            # f = open(file_directory, 'w+')
+            # f.write(script)
         except Exception as err:
             error_message = traceback.format_exc()
             print (error_message)
+            jobs.initiate_python_script(file_directory)
             return error_message
 
 api.add_resource(Delete, '/delete/<string:file_id>')
