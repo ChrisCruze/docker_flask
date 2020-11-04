@@ -74,12 +74,12 @@ def jobs_ready_get():
 
 
 
-while True:
-	python_files = jobs_ready_get()
-	for python_file in python_files:
-		p = Process(target=initiate_python_script, args=(python_file,))
-		p.start()
-		p.join()
-	time.sleep(5)
+# while True:
+# 	python_files = jobs_ready_get()
+# 	for python_file in python_files:
+# 		p = Process(target=initiate_python_script, args=(python_file,))
+# 		p.start()
+# 		p.join()
+# 	time.sleep(5)
 
 

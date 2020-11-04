@@ -128,12 +128,12 @@ def test_function():
 
 
 
-# def run_server():
-#     server.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+def run_server():
+    server.run(host='0.0.0.0', debug=True, threaded=True)
 
 
-# if __name__ == "__main__":
-#     etl_jobs = Process(target=run_job_listener)
-#     flask_server = Process(target=run_server)
-#     etl_jobs.start()
-#     flask_server.start()
+if __name__ == "__main__":
+    etl_jobs = Process(target=run_job_listener)
+    flask_server = Process(target=run_server)
+    etl_jobs.start()
+    flask_server.start()
