@@ -87,6 +87,8 @@ api.add_resource(Start, '/start/<string:file_id>')
 
 
 
+
+
 @server.route("/")
 def hello():
     return render_template("home.html")
@@ -105,23 +107,25 @@ def upload_file():
         uploaded_file.save(directory)
     return redirect(request.url)
 
+def run_job_listener():
+    while True:
+        python_files = jobs.jobs_ready_get()
+        for python_file in python_files:
+            p = Process(target=jobs.initiate_python_script, args=(python_file,))
+            p.start()
+            p.join()
+        time.sleep(5)
 
 
-
-@server.route("/test_function")
+@server.route("/run")
 def test_function():
-    print ("Test Function Ran")
-    return "Test Function here"
+    etl_jobs = Process(target=run_job_listener)
+    etl_jobs.start()
+    print ("Running")
+    return "Running Threaded Job"
 
 
-# def run_job_listener():
-#     while True:
-#         python_files = jobs.jobs_ready_get()
-#         for python_file in python_files:
-#             p = Process(target=jobs.initiate_python_script, args=(python_file,))
-#             p.start()
-#             p.join()
-#         time.sleep(5)
+
 
 
 # def run_server():
