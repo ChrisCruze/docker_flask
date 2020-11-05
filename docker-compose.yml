@@ -9,12 +9,6 @@ services:
     - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command:
     - --config.file=/etc/prometheus/prometheus.yml
-    - --storage.tsdb.path=/prometheus
-    - --web.console.libraries=/etc/prometheus/console_libraries
-    - --web.console.templates=/etc/prometheus/consoles
-    - --storage.tsdb.retention.time=200h
-    - --web.enable-lifecycle
-    restart: unless-stopped
     depends_on:
     - cadvisor
     labels:
@@ -29,18 +23,15 @@ services:
     - /var/run:/var/run:rw
     - /sys:/sys:ro
     - /var/lib/docker/:/var/lib/docker:ro
-    restart: unless-stopped
     depends_on:
     - redis
   redis:
     image: redis:latest
     container_name: redis
-    restart: unless-stopped
     ports:
     - 6379:6379
   web:
     build: .
-    restart: unless-stopped
     ports:
       - "5000:5000"
   node-exporter:
