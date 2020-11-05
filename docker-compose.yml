@@ -11,8 +11,6 @@ services:
     - --config.file=/etc/prometheus/prometheus.yml
     depends_on:
     - cadvisor
-    labels:
-      org.label-schema.group: "monitoring"
   cadvisor:
     image: gcr.io/google-containers/cadvisor:latest
     container_name: cadvisor
