@@ -49,12 +49,3 @@ services:
     restart: unless-stopped
     ports:
       - "9100:9100"
-  pushgateway:
-    image: prom/pushgateway:v1.3.0
-    container_name: pushgateway
-    restart: unless-stopped
-    expose:
-      - 9091
-    labels:
-      org.label-schema.group: "monitoring"
-
